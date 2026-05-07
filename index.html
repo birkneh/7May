@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0d0d0f" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>HIP-SAFE 70 · Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg: #0d0d0f;
+    --bg-2: #16161a;
+    --card: #1c1c22;
+    --card-2: #23232b;
+    --line: #2a2a32;
+    --ink: #ffffff;
+    --ink-dim: #a8a8b3;
+    --accent: #ff5b1f;
+    --accent-2: #ffd23f;
+    --good: #2ecc71;
+    --warn: #ff4d4d;
+    --safe: #00d4ff;
+    --r: 18px;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+  body { min-height: 100vh; min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 18px 16px 220px; }
+
+  /* HEADER */
+  header.top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .logo { font-family: 'Anton', sans-serif; font-size: 36px; line-height: 1; letter-spacing: 0.5px; text-transform: uppercase; }
+  .logo span { color: var(--accent); }
+  .total-pill { background: var(--accent); color: #111; font-family: 'Bebas Neue', sans-serif; font-size: 22px; padding: 8px 14px; border-radius: 999px; letter-spacing: 1.5px; }
+
+  /* SAFETY BANNER */
+  .safety { background: linear-gradient(135deg, #2a1a0d, #1a0d05); border: 2px solid var(--accent); border-radius: var(--r); padding: 14px 16px; margin-bottom: 18px; }
+  .safety h3 { font-family: 'Anton', sans-serif; margin: 0 0 6px; font-size: 22px; letter-spacing: 1px; color: var(--accent-2); text-transform: uppercase; }
+  .safety p { margin: 0; color: var(--ink-dim); font-size: 14px; line-height: 1.5; font-weight: 500; }
+
+  /* PROGRESS */
+  .progress-wrap { margin-bottom: 18px; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1.5px; font-size: 16px; color: var(--ink-dim); }
+  .progress-bar { width: 100%; height: 10px; background: var(--card); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 0.4s ease; }
+
+  /* PHASE GROUPS */
+  .phase { margin-top: 22px; }
+  .phase-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .phase-num { font-family: 'Anton', sans-serif; font-size: 44px; line-height: 0.9; color: var(--accent); }
+  .phase-title { font-family: 'Anton', sans-serif; font-size: 26px; line-height: 1; letter-spacing: 1px; text-transform: uppercase; }
+  .phase-time { margin-left: auto; font-family: 'Bebas Neue', sans-serif; font-size: 18px; background: var(--card); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; color: var(--ink-dim); }
+
+  /* EXERCISE CARDS */
+  .ex-list { display: flex; flex-direction: column; gap: 12px; }
+  .ex { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; transition: border-color 0.2s; }
+  .ex.active { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,91,31,0.18); }
+  .ex.done { opacity: 0.65; }
+  .ex.done .ex-title { text-decoration: line-through; }
+
+  .ex-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .ex-title { font-family: 'Anton', sans-serif; font-size: 21px; line-height: 1.05; letter-spacing: 0.5px; text-transform: uppercase; flex: 1; min-width: 0; }
+  .ex-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .ex-target { font-family: 'Bebas Neue', sans-serif; font-size: 20px; background: var(--bg-2); border-radius: 10px; padding: 4px 10px; color: var(--accent-2); letter-spacing: 1.2px; white-space: nowrap; }
+  .ex-rest { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: var(--ink-dim); letter-spacing: 1.5px; }
+  .ex-cues { margin-top: 8px; font-size: 13px; color: var(--ink-dim); font-weight: 600; line-height: 1.5; }
+
+  /* SET TRACKER */
+  .sets { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .set-row {
+    display: grid;
+    grid-template-columns: 38px 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+    background: var(--bg-2);
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .set-row.completed { border-color: var(--good); background: rgba(46, 204, 113, 0.07); }
+  .set-row.next { border-color: var(--accent); }
+  .set-num { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--accent); text-align: center; line-height: 1; }
+  .set-input {
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    width: 100%;
+    text-align: center;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .set-input::-webkit-outer-spin-button, .set-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .set-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .set-input::placeholder { color: #5a5a66; }
+  .set-input-wrap { position: relative; }
+  .set-input-suffix { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: var(--ink-dim); letter-spacing: 1px; pointer-events: none; }
+  .set-check {
+    width: 38px; height: 38px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    color: var(--good);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .set-check:active { transform: scale(0.95); }
+  .set-row.completed .set-check { background: var(--good); color: #fff; border-color: var(--good); }
+
+  .set-header { display: grid; grid-template-columns: 38px 1fr 1fr 38px; gap: 8px; padding: 0 10px; font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: var(--ink-dim); letter-spacing: 1.5px; }
+
+  .last-session { font-family: 'Bebas Neue', sans-serif; font-size: 12px; color: var(--safe); letter-spacing: 1.5px; margin-top: 6px; }
+
+  /* TIME-BASED EXERCISE */
+  .ex-time-block { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+  .ex-time-block .btn { flex: 1; justify-content: center; }
+
+  /* ACTIONS */
+  .ex-actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line); background: var(--bg-2);
+    color: var(--ink);
+    padding: 8px 12px; border-radius: 10px;
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px;
+    cursor: pointer; transition: background 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:hover { background: #25252e; }
+  .btn-primary { background: var(--accent); color: #111; border-color: var(--accent); }
+  .btn-primary:hover { background: #ff7b3f; }
+
+  /* TIMER OVERLAY */
+  .timer-bar {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(13,13,15,0.97);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-top: 2px solid var(--accent);
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom)) 16px;
+    z-index: 30;
+    transform: translateY(0);
+    transition: transform 0.25s ease;
+  }
+  .timer-bar.hidden { transform: translateY(110%); }
+  .timer-bar.rest { border-top-color: var(--safe); }
+  .timer-grid { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+  .timer-label { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--ink-dim); letter-spacing: 2px; text-transform: uppercase; }
+  .timer-bar.rest .timer-label { color: var(--safe); }
+  .timer-name { font-family: 'Anton', sans-serif; font-size: 22px; line-height: 1.1; letter-spacing: 0.5px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .timer-clock { font-family: 'Anton', sans-serif; font-size: 56px; line-height: 0.9; color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  .timer-bar.rest .timer-clock { color: var(--safe); }
+  .timer-clock.warn { color: var(--warn) !important; }
+  .timer-controls { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; margin-top: 4px; }
+  .ctl { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 12px; border-radius: 12px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1.5px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .ctl:active { transform: scale(0.97); }
+  .ctl-main { background: var(--accent); color: #111; border-color: var(--accent); font-size: 22px; padding: 12px 16px; }
+  .ctl-main.paused { background: var(--good); border-color: var(--good); }
+  .ctl-add { font-size: 14px; padding: 8px 10px; }
+
+  /* TOP CONTROLS */
+  .top-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .top-controls .btn { flex: 1; justify-content: center; min-width: 0; }
+
+  /* FOOTER */
+  .foot { margin-top: 28px; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink-dim); font-size: 13px; line-height: 1.55; font-weight: 600; }
+  .foot strong { color: var(--ink); }
+
+  /* RESPONSIVE */
+  @media (max-width: 420px) {
+    .logo { font-size: 30px; }
+    .total-pill { font-size: 18px; padding: 6px 10px; }
+    .phase-num { font-size: 36px; }
+    .phase-title { font-size: 20px; }
+    .ex-title { font-size: 18px; }
+    .timer-clock { font-size: 44px; }
+    .ctl-main { font-size: 18px; padding: 10px 12px; }
+    .set-row { grid-template-columns: 32px 1fr 1fr 36px; gap: 6px; padding: 6px 8px; }
+    .set-num { font-size: 18px; }
+    .set-check { width: 36px; height: 36px; font-size: 20px; }
+    .set-input { font-size: 16px; padding: 7px 8px; }
+  }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">HIP<span>·</span>SAFE<span>·</span>70</div>
+    <div class="total-pill">~80 MIN · GYM</div>
+  </header>
+
+  <div class="safety">
+    <h3>READ FIRST · LEFT HIP RULES</h3>
+    <p>Stay in pain-free range. Keep leg-press depth above 90° knee bend, skip anything that pinches the front of the hip, mirror reps on both sides, and stop if pain rises above 3/10. Log lighter weights on the symptomatic side if needed — same volume, less load.</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progressLabel">0 / 0 SETS</span>
+      <span id="progressTime">0 / 70 MIN</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="top-controls">
+    <button class="btn btn-primary" id="startAll">▶ BEGIN WORKOUT</button>
+    <button class="btn" id="resetAll">↺ RESET TODAY</button>
+    <button class="btn" id="clearMem">⚠ CLEAR ALL DATA</button>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="foot">
+    <strong>HOST IT ON YOUR PHONE (GitHub Pages):</strong><br>
+    1. New public repo, e.g. <em>hip-safe-70</em>.<br>
+    2. Upload this file as <em>index.html</em>.<br>
+    3. Repo → <em>Settings</em> → <em>Pages</em> → Source: <em>Deploy from branch</em> → Branch: <em>main</em> / <em>(root)</em> → Save.<br>
+    4. Open <em>https://&lt;your-username&gt;.github.io/hip-safe-70/</em> on your phone.<br>
+    5. iPhone: Share → <em>Add to Home Screen</em>. Android: Chrome menu → <em>Add to Home screen</em>.<br>
+    <br>
+    <strong>TIP:</strong> weights and last-session memory are saved on your phone only. Click <em>CLEAR ALL DATA</em> to wipe everything.
+  </div>
+</div>
+
+<div class="timer-bar hidden" id="timerBar" role="region" aria-label="Workout timer">
+  <div class="timer-grid">
+    <div>
+      <div class="timer-label" id="timerLabel">READY</div>
+      <div class="timer-name" id="timerName">—</div>
+    </div>
+    <div class="timer-clock" id="timerClock">00:00</div>
+    <div class="timer-controls">
+      <button class="ctl ctl-add" id="ctlMinus">−15s</button>
+      <button class="ctl ctl-main" id="ctlPlay">PAUSE</button>
+      <button class="ctl ctl-add" id="ctlPlus">+15s</button>
+      <button class="ctl" id="ctlStop">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ PROGRAM DATA ============
+ * 70-minute hip-protective full-gym workout, hypertrophy bias 8-12 reps.
+ * Each "sets" exercise has sets, target reps, and rest seconds.
+ * Each "time" exercise has a fixed duration. */
+
+const PROGRAM = [
+  {
+    title: "Warm-Up",
+    items: [
+      { id: "wu1", type: "time", name: "Bike or Elliptical", sec: 480, cues: "Easy pace, RPE 4–5. Light resistance, no hip strain. Wake up the joint and circulation.", search: "stationary bike warmup proper form" },
+      { id: "wu2", type: "time", name: "Banded Glute Activation", sec: 120, cues: "Mini band above knees. 10 lateral steps each direction + 10 monster walks fwd / bwd. Glutes ON.", search: "banded glute activation lateral monster walks" }
+    ]
+  },
+  {
+    title: "Lower Body Machines",
+    items: [
+      { id: "lb1", type: "sets", name: "Leg Press (Partial ROM)", sets: 4, reps: 10, restSec: 90, cues: "Keep knees ABOVE 90° — protects the hip. Heels flat, slow eccentric (3s down).", search: "leg press machine partial range of motion tutorial" },
+      { id: "lb2", type: "sets", name: "Seated Leg Curl", sets: 4, reps: 12, restSec: 75, cues: "Hamstring focus = hip joint protection. Squeeze at full contraction, slow on the lowering.", search: "seated leg curl machine tutorial proper form" },
+      { id: "lb3", type: "sets", name: "Hip Abduction Machine", sets: 4, reps: 15, restSec: 60, cues: "Glute medius — the main hip stabilizer. Push knees out slow, 1s pause at end range.", search: "hip abduction machine glute medius tutorial" },
+      { id: "lb4", type: "sets", name: "Hip Adduction Machine", sets: 3, reps: 15, restSec: 60, cues: "Inner thigh + adductor support. Light to moderate weight. Stop if hip pinches.", search: "hip adduction machine tutorial proper form" },
+      { id: "lb5", type: "sets", name: "Seated Calf Raise", sets: 4, reps: 15, restSec: 45, cues: "Full ROM, 2s up, 3s down. Pump the calves for ankle / lower-leg health.", search: "seated calf raise machine tutorial" }
+    ]
+  },
+  {
+    title: "Core Stability",
+    items: [
+      { id: "co1", type: "sets", name: "Cable Pallof Press", sets: 3, reps: 12, restSec: 45, cues: "Anti-rotation. Press cable straight out, RESIST the twist. 12 each side per set.", search: "cable pallof press anti rotation tutorial" },
+      { id: "co2", type: "sets", name: "Cable Wood Chop (Gentle)", sets: 3, reps: 12, restSec: 45, cues: "High-to-low or low-to-high. Move from the torso, not the hip. Light load — 12 each side.", search: "cable wood chop core exercise tutorial" },
+      { id: "co3", type: "time", name: "Plank Hold ×3", sec: 180, cues: "3 × 45s holds with ~30s rest in between. Glutes squeezed, ribs tucked. Drop to knees if needed.", search: "plank hold proper form tutorial" }
+    ]
+  },
+  {
+    title: "Upper Body Machines",
+    items: [
+      { id: "ub1", type: "sets", name: "Lat Pulldown", sets: 4, reps: 10, restSec: 75, cues: "Wide grip. Pull to upper chest, drive elbows down + back. Don't yank with the lower back.", search: "lat pulldown machine tutorial proper form" },
+      { id: "ub2", type: "sets", name: "Chest Press Machine", sets: 4, reps: 10, restSec: 75, cues: "Set seat so handles align with mid-chest. Don't bounce — controlled tempo.", search: "chest press machine tutorial proper form" },
+      { id: "ub3", type: "sets", name: "Seated Cable Row", sets: 3, reps: 12, restSec: 60, cues: "Chest up, hinge from hips slightly. Pull to lower ribs. Squeeze shoulder blades.", search: "seated cable row machine tutorial" },
+      { id: "ub4", type: "sets", name: "Shoulder Press Machine", sets: 3, reps: 10, restSec: 60, cues: "Don't flare elbows wide. Press up, control on the way down.", search: "shoulder press machine tutorial proper form" },
+      { id: "ub5", type: "sets", name: "Lateral Raise (Machine or DB)", sets: 2, reps: 12, restSec: 45, cues: "Light weight. Lead with elbows, lift to shoulder height. No swinging.", search: "lateral raise machine dumbbell tutorial" }
+    ]
+  },
+  {
+    title: "Cooldown",
+    items: [
+      { id: "cd1", type: "time", name: "Recumbent Bike (Easy)", sec: 240, cues: "Very light resistance. Flush the legs, drop heart rate.", search: "recumbent bike cooldown low intensity" },
+      { id: "cd2", type: "time", name: "Mat Stretches", sec: 240, cues: "60s each: supine figure-4 (gentle), towel hamstring stretch, child's pose w/ knees wide, lying twist.", search: "post workout stretches mat hip hamstring" }
+    ]
+  }
+];
+
+/* ============ STATE & PERSISTENCE ============ */
+const STORAGE_KEY = "hipsafe70:v1";
+
+const state = {
+  flat: [],            // [{id, type, ...}]
+  current: -1,         // active exercise index
+  // Set tracking: { [exId]: { sets: [{w, reps, done}], lastWeights: [..], lastDate: ts } }
+  data: {},
+  timer: { id: null, remaining: 0, paused: false, mode: 'idle', exId: null }
+  // mode: 'idle' | 'time' (countdown for time exercise) | 'rest' (between sets)
+};
+
+function flatten() {
+  state.flat = [];
+  PROGRAM.forEach((ph, pi) => ph.items.forEach((ex, ei) => {
+    state.flat.push({ ...ex, phaseIndex: pi, exIndex: ei, key: ex.id });
+  }));
+}
+flatten();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const obj = JSON.parse(raw);
+    if (obj && obj.data) state.data = obj.data;
+  } catch(e) { console.warn('load state failed', e); }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: state.data }));
+  } catch(e) { console.warn('save state failed', e); }
+}
+function resetToday() {
+  // Clear today's checkboxes/inputs but keep last-session memory
+  Object.keys(state.data).forEach(id => {
+    const d = state.data[id];
+    if (d && d.sets) d.sets.forEach(s => { s.done = false; s.w = ''; s.reps = ''; });
+    if (d && d.timeDone) d.timeDone = false;
+  });
+  saveState();
+  state.current = -1;
+  stopTimer();
+  render();
+}
+function clearAll() {
+  if (!confirm('Wipe ALL saved weights, history, and progress?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state.data = {};
+  state.current = -1;
+  stopTimer();
+  render();
+}
+function ensureDataFor(ex) {
+  if (state.data[ex.id]) return state.data[ex.id];
+  if (ex.type === 'sets') {
+    state.data[ex.id] = {
+      sets: Array.from({ length: ex.sets }, () => ({ w: '', reps: '', done: false })),
+      lastWeights: null,
+      lastDate: null
+    };
+  } else {
+    state.data[ex.id] = { timeDone: false };
+  }
+  return state.data[ex.id];
+}
+
+/* ============ AUDIO ============ */
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; }
+  }
+  return audioCtx;
+}
+function beep(freq, dur, vol = 0.15) {
+  const ctx = getCtx(); if (!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.frequency.value = freq; o.type = 'sine'; g.gain.value = vol;
+  o.connect(g); g.connect(ctx.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.stop(ctx.currentTime + dur);
+}
+const startBeep = () => beep(880, 0.18);
+const softBeep = () => beep(660, 0.08, 0.10);
+const finishBeep = () => { beep(523, 0.15); setTimeout(() => beep(784, 0.20), 180); };
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.0; u.volume = 0.9;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+/* ============ TIMER (handles both 'time' exercises and rest periods) ============ */
+const timerBar = document.getElementById('timerBar');
+const timerLabel = document.getElementById('timerLabel');
+const timerName = document.getElementById('timerName');
+const timerClock = document.getElementById('timerClock');
+const ctlPlay = document.getElementById('ctlPlay');
+
+function fmt(s) { const m = Math.floor(s/60), x = s%60; return `${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`; }
+
+function startTimeExercise(idx) {
+  const ex = state.flat[idx];
+  if (!ex || ex.type !== 'time') return;
+  state.current = idx;
+  state.timer.mode = 'time';
+  state.timer.exId = ex.id;
+  state.timer.remaining = ex.sec;
+  state.timer.paused = false;
+  ctlPlay.textContent = 'PAUSE';
+  ctlPlay.classList.remove('paused');
+  timerBar.classList.remove('rest');
+  timerLabel.textContent = `PHASE ${ex.phaseIndex+1} · TIMED`;
+  timerName.textContent = ex.name;
+  timerClock.textContent = fmt(state.timer.remaining);
+  timerClock.classList.remove('warn');
+  showTimer();
+  startBeep();
+  speak(ex.name);
+  if (state.timer.id) clearInterval(state.timer.id);
+  state.timer.id = setInterval(tick, 1000);
+  scrollToCurrent();
+  render();
+}
+
+function startRest(ex, setIdx) {
+  state.timer.mode = 'rest';
+  state.timer.exId = ex.id;
+  state.timer.remaining = ex.restSec;
+  state.timer.paused = false;
+  ctlPlay.textContent = 'PAUSE';
+  ctlPlay.classList.remove('paused');
+  timerBar.classList.add('rest');
+  timerLabel.textContent = `REST · SET ${setIdx+1} OF ${ex.sets} DONE`;
+  timerName.textContent = ex.name;
+  timerClock.textContent = fmt(state.timer.remaining);
+  timerClock.classList.remove('warn');
+  showTimer();
+  softBeep();
+  if (state.timer.id) clearInterval(state.timer.id);
+  state.timer.id = setInterval(tick, 1000);
+}
+
+function tick() {
+  if (state.timer.paused) return;
+  state.timer.remaining--;
+  if (state.timer.remaining <= 5 && state.timer.remaining > 0) {
+    timerClock.classList.add('warn');
+    softBeep();
+  }
+  timerClock.textContent = fmt(Math.max(0, state.timer.remaining));
+  if (state.timer.remaining <= 0) {
+    finishBeep();
+    clearInterval(state.timer.id);
+    state.timer.id = null;
+    if (state.timer.mode === 'time') {
+      // Mark time exercise done
+      const ex = state.flat.find(e => e.id === state.timer.exId);
+      if (ex) {
+        ensureDataFor(ex).timeDone = true;
+        saveState();
+      }
+      // Auto-advance to next
+      const nextIdx = state.current + 1;
+      if (nextIdx < state.flat.length && state.flat[nextIdx].type === 'time') {
+        startTimeExercise(nextIdx);
+        return;
+      }
+      stopTimer();
+      timerLabel.textContent = "DONE";
+      timerName.textContent = ex ? `${ex.name} complete` : "Complete";
+      speak("Done");
+    } else if (state.timer.mode === 'rest') {
+      timerLabel.textContent = "GO! NEXT SET";
+      speak("Next set");
+      // hide after a moment
+      setTimeout(() => { hideTimer(); state.timer.mode = 'idle'; }, 1500);
+    }
+    render();
+  }
+}
+
+function pauseToggle() {
+  if (!state.timer.id && state.timer.mode === 'idle') return;
+  state.timer.paused = !state.timer.paused;
+  ctlPlay.textContent = state.timer.paused ? 'RESUME' : 'PAUSE';
+  ctlPlay.classList.toggle('paused', state.timer.paused);
+}
+function adjustTimer(delta) {
+  state.timer.remaining = Math.max(1, state.timer.remaining + delta);
+  timerClock.textContent = fmt(state.timer.remaining);
+}
+function stopTimer() {
+  if (state.timer.id) clearInterval(state.timer.id);
+  state.timer = { id: null, remaining: 0, paused: false, mode: 'idle', exId: null };
+  hideTimer();
+}
+function showTimer() { timerBar.classList.remove('hidden'); }
+function hideTimer() { timerBar.classList.add('hidden'); }
+
+function scrollToCurrent() {
+  if (state.current < 0) return;
+  const ex = state.flat[state.current];
+  if (!ex) return;
+  const el = document.querySelector(`.ex[data-id="${ex.id}"]`);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ============ SET ACTIONS ============ */
+function toggleSet(exId, setIdx) {
+  const ex = state.flat.find(e => e.id === exId);
+  if (!ex) return;
+  const d = ensureDataFor(ex);
+  const s = d.sets[setIdx];
+  s.done = !s.done;
+  if (s.done) {
+    // capture inputs from DOM
+    const wEl = document.querySelector(`input[data-ex="${exId}"][data-set="${setIdx}"][data-field="w"]`);
+    const rEl = document.querySelector(`input[data-ex="${exId}"][data-set="${setIdx}"][data-field="reps"]`);
+    if (wEl) s.w = wEl.value;
+    if (rEl) s.reps = rEl.value;
+    // last weights snapshot when all sets done
+    if (d.sets.every(x => x.done)) {
+      d.lastWeights = d.sets.map(x => x.w);
+      d.lastDate = Date.now();
+    }
+    finishBeep();
+    // start rest timer (unless this was the final set)
+    if (!d.sets.every(x => x.done)) startRest(ex, setIdx);
+    else {
+      stopTimer();
+      timerLabel.textContent = "EXERCISE COMPLETE";
+      timerName.textContent = ex.name;
+      timerClock.textContent = "✓";
+      timerBar.classList.remove('rest');
+      showTimer();
+      setTimeout(hideTimer, 2500);
+    }
+  } else {
+    // unticking — clear that set
+    s.w = ''; s.reps = ''; s.done = false;
+  }
+  saveState();
+  render();
+}
+
+function updateSetInput(exId, setIdx, field, value) {
+  const ex = state.flat.find(e => e.id === exId);
+  if (!ex) return;
+  const d = ensureDataFor(ex);
+  d.sets[setIdx][field] = value;
+  saveState();
+  // don't re-render on every keystroke
+}
+
+/* ============ RENDER ============ */
+const phasesEl = document.getElementById('phases');
+
+function render() {
+  phasesEl.innerHTML = '';
+  PROGRAM.forEach((ph, pi) => {
+    const phEl = document.createElement('section');
+    phEl.className = 'phase';
+    phEl.innerHTML = `
+      <div class="phase-head">
+        <div class="phase-num">${String(pi+1).padStart(2,'0')}</div>
+        <div class="phase-title">${ph.title}</div>
+        <div class="phase-time">${phaseMinutes(ph)} MIN</div>
+      </div>
+      <div class="ex-list" data-phase="${pi}"></div>
+    `;
+    const list = phEl.querySelector('.ex-list');
+    ph.items.forEach((ex, ei) => {
+      list.appendChild(renderExercise(ex));
+    });
+    phasesEl.appendChild(phEl);
+  });
+  updateProgress();
+}
+
+function phaseMinutes(ph) {
+  let mins = 0;
+  ph.items.forEach(ex => {
+    if (ex.type === 'time') mins += ex.sec / 60;
+    else mins += (ex.sets * (ex.reps * 3 + ex.restSec)) / 60; // rough estimate
+  });
+  return Math.round(mins);
+}
+
+function renderExercise(ex) {
+  const idx = state.flat.findIndex(e => e.id === ex.id);
+  const isActive = idx === state.current;
+  const d = ensureDataFor(ex);
+  const isDone = ex.type === 'sets' ? d.sets.every(s => s.done) : d.timeDone;
+  const card = document.createElement('div');
+  card.className = 'ex' + (isActive ? ' active' : '') + (isDone ? ' done' : '');
+  card.dataset.id = ex.id;
+
+  const ytQuery = encodeURIComponent(ex.search || ex.name + ' tutorial');
+  const ytBtn = `<a class="btn" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${ytQuery}">▶ DEMO VIDEO</a>`;
+
+  if (ex.type === 'time') {
+    const mins = Math.floor(ex.sec/60), secs = ex.sec%60;
+    const dur = mins ? `${mins}:${String(secs).padStart(2,'0')}` : `${secs}s`;
+    card.innerHTML = `
+      <div class="ex-row">
+        <div class="ex-title">${ex.name}</div>
+        <div class="ex-meta"><div class="ex-target">${dur}</div></div>
+      </div>
+      <div class="ex-cues">${ex.cues}</div>
+      <div class="ex-time-block">
+        <button class="btn btn-primary" data-act="play-time" data-id="${ex.id}">▶ START</button>
+        ${ytBtn}
+        <button class="btn" data-act="toggle-time" data-id="${ex.id}">${isDone ? '↺ UNDO' : '✓ DONE'}</button>
+      </div>
+    `;
+  } else {
+    const last = d.lastWeights;
+    const lastHTML = last && last.some(w => w)
+      ? `<div class="last-session">LAST: ${last.map(w => w || '–').join(' · ')}</div>`
+      : '';
+    let setsHTML = `
+      <div class="set-header">
+        <div>SET</div><div>WEIGHT</div><div>REPS</div><div></div>
+      </div>
+    `;
+    let nextSetIdx = d.sets.findIndex(s => !s.done);
+    d.sets.forEach((s, i) => {
+      const cls = 'set-row' + (s.done ? ' completed' : (i === nextSetIdx ? ' next' : ''));
+      const lastW = last ? (last[i] || '') : '';
+      setsHTML += `
+        <div class="${cls}" data-set-row="${i}">
+          <div class="set-num">${i+1}</div>
+          <div class="set-input-wrap">
+            <input class="set-input" type="number" inputmode="decimal" step="0.5"
+              placeholder="${lastW || '–'}"
+              value="${s.w}"
+              data-ex="${ex.id}" data-set="${i}" data-field="w" />
+          </div>
+          <div class="set-input-wrap">
+            <input class="set-input" type="number" inputmode="numeric" step="1"
+              placeholder="${ex.reps}"
+              value="${s.reps}"
+              data-ex="${ex.id}" data-set="${i}" data-field="reps" />
+          </div>
+          <button class="set-check" data-act="toggle-set" data-id="${ex.id}" data-set="${i}" aria-label="Set ${i+1} done">${s.done ? '✓' : ''}</button>
+        </div>
+      `;
+    });
+    card.innerHTML = `
+      <div class="ex-row">
+        <div class="ex-title">${ex.name}</div>
+        <div class="ex-meta">
+          <div class="ex-target">${ex.sets}×${ex.reps}</div>
+          <div class="ex-rest">REST ${ex.restSec}s</div>
+        </div>
+      </div>
+      <div class="ex-cues">${ex.cues}</div>
+      ${lastHTML}
+      <div class="sets">${setsHTML}</div>
+      <div class="ex-actions">
+        ${ytBtn}
+        <button class="btn" data-act="rest" data-id="${ex.id}">⏱ START REST</button>
+      </div>
+    `;
+  }
+  return card;
+}
+
+function updateProgress() {
+  let totalSets = 0, doneSets = 0, totalSec = 0, doneSec = 0;
+  state.flat.forEach(ex => {
+    const d = ensureDataFor(ex);
+    if (ex.type === 'sets') {
+      totalSets += ex.sets;
+      doneSets += d.sets.filter(s => s.done).length;
+      const setSec = (ex.reps * 3 + ex.restSec);
+      totalSec += setSec * ex.sets;
+      doneSec += setSec * d.sets.filter(s => s.done).length;
+    } else {
+      totalSets += 1;
+      if (d.timeDone) doneSets += 1;
+      totalSec += ex.sec;
+      if (d.timeDone) doneSec += ex.sec;
+    }
+  });
+  document.getElementById('progressLabel').textContent = `${doneSets} / ${totalSets} SETS`;
+  document.getElementById('progressTime').textContent = `${Math.round(doneSec/60)} / ${Math.round(totalSec/60)} MIN`;
+  document.getElementById('progressFill').style.width = (totalSets ? doneSets/totalSets*100 : 0) + '%';
+}
+
+/* ============ EVENTS ============ */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act]');
+  if (!t) return;
+  const act = t.dataset.act;
+  const id = t.dataset.id;
+  const ex = state.flat.find(x => x.id === id);
+  if (!ex) return;
+  if (act === 'play-time') {
+    getCtx();
+    state.current = state.flat.findIndex(x => x.id === id);
+    startTimeExercise(state.current);
+  }
+  if (act === 'toggle-time') {
+    const d = ensureDataFor(ex);
+    d.timeDone = !d.timeDone;
+    saveState();
+    render();
+  }
+  if (act === 'toggle-set') {
+    getCtx();
+    state.current = state.flat.findIndex(x => x.id === id);
+    toggleSet(id, parseInt(t.dataset.set, 10));
+  }
+  if (act === 'rest') {
+    getCtx();
+    state.current = state.flat.findIndex(x => x.id === id);
+    startRest(ex, 0);
+    render();
+  }
+});
+
+// debounced save on input changes
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (!el.classList.contains('set-input')) return;
+  const exId = el.dataset.ex;
+  const setIdx = parseInt(el.dataset.set, 10);
+  const field = el.dataset.field;
+  updateSetInput(exId, setIdx, field, el.value);
+});
+
+document.getElementById('ctlPlay').addEventListener('click', pauseToggle);
+document.getElementById('ctlPlus').addEventListener('click', () => adjustTimer(15));
+document.getElementById('ctlMinus').addEventListener('click', () => adjustTimer(-15));
+document.getElementById('ctlStop').addEventListener('click', stopTimer);
+document.getElementById('startAll').addEventListener('click', () => {
+  getCtx();
+  state.current = 0;
+  startTimeExercise(0);
+});
+document.getElementById('resetAll').addEventListener('click', () => {
+  if (confirm('Reset today\'s checkboxes and inputs? Last-session weights will be kept.')) resetToday();
+});
+document.getElementById('clearMem').addEventListener('click', clearAll);
+
+/* Wake lock */
+let wakeLock = null;
+async function keepAwake() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.timer.id) keepAwake();
+});
+
+/* INIT */
+loadState();
+state.flat.forEach(ensureDataFor);
+render();
+</script>
+</body>
+</html>
