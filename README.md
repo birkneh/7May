@@ -1,4 +1,21 @@
-# HIP-SAFE 70 · Gym Edition
+# IRONLINE 3X · 4-Week Block (`4week.html`)
+
+A BetterMe-style 4-week training program app you run from your phone. (Successor to HIP-SAFE 70 below — the hip restrictions were lifted once the hip was pain-free.)
+
+- **12 sessions · 3 full-body workouts per week** on non-consecutive days (e.g. Mon/Wed/Fri): Lower Focus → Upper Focus → Legs & Arms
+- **Common gym exercises only** — squat, leg press, lunges, Romanian deadlift, leg curl, leg extension, calf raises, chest press, pec deck, lat pulldown, cable row, shoulder press, lateral raise, biceps curl, triceps pushdown, plank, crunches
+- **Every muscle group ≥2× per week within the 3 sessions**: quads A+C · hams A+C · glutes A+C · calves A+C · chest A+B · back A+B · shoulders A+B · biceps B+C · triceps B+C · core in all three
+- **Progressive overload by week**: W1 Foundation 3×10–12 · W2 Build 3×12–15 · W3 Push 4×10–12 · W4 Peak 4×8–10, with rest periods that change per week
+- **Session streak counter** and overall program progress bar; "next up" is always the first uncompleted session
+- Per-set **weight + reps logging** with "last time" hints pulled from the same session the week before
+- **Auto rest timer** on every checked set, countdown timers with beeps on timed blocks, demo-video buttons
+- Everything persists on-device via `localStorage`
+
+Deploy the same way as below (GitHub Pages), then open `https://<user>.github.io/7May/4week.html` and Add to Home Screen.
+
+---
+
+# HIP-SAFE 70 · Gym Edition (`index.html`)
 
 A ~75–85 minute hip-protective full-gym workout app you run from your phone's home screen. Hypertrophy bias (8–12 reps), machine-heavy, with set/rep/weight tracking and an automatic rest timer.
 
